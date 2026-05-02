@@ -1,0 +1,88 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 0. Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Phase 3: Primitives
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // 1. User Profiles
+    match /users/{userId} {
+      function isValidUser(data) {
+        return data.keys().hasAll(['email']) &&
+               data.keys().size() <= 10 &&
+               data.email is string && data.email.size() <= 256;
+      }
+
+      allow get: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidUser(request.resource.data);
+      allow update: if isOwner(userId) && isValidUser(request.resource.data);
+      
+      // 2. Chat Sessions
+      match /sessions/{sessionId} {
+        function isValidSession(data) {
+          return data.keys().hasAll(['title', 'updatedAt', 'createdAt']) &&
+                 data.keys().size() <= 5 &&
+                 data.title is string && data.title.size() <= 1000 &&
+                 data.updatedAt is number &&
+                 data.createdAt is number;
+        }
+
+        allow list: if isOwner(userId);
+        allow get: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidSession(request.resource.data);
+        allow update: if isOwner(userId) && isValidSession(request.resource.data);
+        allow delete: if isOwner(userId);
+
+        // 3. Messages
+        match /messages/{messageId} {
+          function isValidMessage(data) {
+            return data.keys().hasAll(['role', 'content', 'timestamp']) &&
+                   data.role in ['user', 'assistant', 'model'] &&
+                   data.content is string && data.content.size() <= 50000 &&
+                   data.timestamp is number;
+          }
+
+          allow list: if isOwner(userId);
+          allow create: if isOwner(userId) && isValidMessage(request.resource.data);
+          allow update: if isOwner(userId) && isValidMessage(request.resource.data);
+          allow delete: if isOwner(userId);
+        }
+      }
+
+      // 4. Academic Records
+      match /academic/record {
+        function isValidRecord(data) {
+          return data.keys().hasAll(['semesters', 'updatedAt']) &&
+                 data.semesters is list &&
+                 data.updatedAt is number;
+        }
+        allow get: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidRecord(request.resource.data);
+      }
+
+      match /academic/gpa_record {
+        function isValidGpaRecord(data) {
+          return data.keys().hasAll(['courses', 'updatedAt']) &&
+                 data.courses is list &&
+                 data.updatedAt is number;
+        }
+        allow get: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidGpaRecord(request.resource.data);
+      }
+    }
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "Store user specific metadata and preferences.",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string" },
+        "lastLogin": { "type": "string", "format": "date-time" }
+      },
+      "required": ["email"]
+    },
+    "ChatSession": {
+      "title": "Chat Session",
+      "description": "A container for a conversation between the user and AI.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "updatedAt": { "type": "number" },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["title", "updatedAt", "createdAt"]
+    },
+    "Message": {
+      "title": "Message",
+      "description": "An individual message in a chat session.",
+      "type": "object",
+      "properties": {
+        "role": { "type": "string", "enum": ["user", "assistant", "model"] },
+        "content": { "type": "string" },
+        "attachments": { "type": "array", "items": { "type": "string" } },
+        "timestamp": { "type": "number" }
+      },
+      "required": ["role", "content", "timestamp"]
+    },
+    "AcademicRecord": {
+      "title": "Academic Record",
+      "description": "Stores CGPA/Semester related data including manual mode support.",
+      "type": "object",
+      "properties": {
+        "semesters": { 
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "name": { "type": "string" },
+              "courses": { "type": "array" },
+              "isManual": { "type": "boolean" },
+              "manualGpa": { "type": "number" },
+              "manualUnits": { "type": "number" }
+            }
+          }
+        },
+        "updatedAt": { "type": "number" }
+      },
+      "required": ["semesters", "updatedAt"]
+    },
+    "GpaRecord": {
+      "title": "GPA Record",
+      "description": "Stores individual session GPA courses.",
+      "type": "object",
+      "properties": {
+        "courses": { "type": "array" },
+        "updatedAt": { "type": "number" }
+      },
+      "required": ["courses", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Individual user profiles."
+    },
+    "/users/{userId}/sessions/{sessionId}": {
+      "schema": "ChatSession",
+      "description": "Chat sessions associated with a user."
+    },
+    "/users/{userId}/sessions/{sessionId}/messages/{messageId}": {
+      "schema": "Message",
+      "description": "Messages within a chat session."
+    },
+    "/users/{userId}/academic/record": {
+      "schema": "AcademicRecord",
+      "description": "User cumulative semester records."
+    },
+    "/users/{userId}/academic/gpa_record": {
+      "schema": "GpaRecord",
+      "description": "User session GPA records."
+    }
+  }
+}
