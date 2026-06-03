@@ -31,8 +31,8 @@ export interface Semester {
   semesterType: 1 | 2; // 1st or 2nd semester
   courses: Course[];
   isManual?: boolean;
-  manualGpa?: number;
-  manualUnits?: number;
+  manualGpa?: number | string;
+  manualUnits?: number | string;
 }
 
 export interface AcademicRecord {

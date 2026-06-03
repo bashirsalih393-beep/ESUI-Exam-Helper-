@@ -104,7 +104,7 @@ export async function generateVideo(prompt: string, onUpdate?: (msg: string) => 
 
   while (!operation.done) {
     if (onUpdate) onUpdate("Processing video... This usually takes 2-5 minutes.");
-    await new Promise(resolve => setTimeout(resolve, 10000));
+    await new Promise(resolve => setTimeout(resolve, 3000)); // Faster polling for snappiness
     operation = await genAI.operations.getVideosOperation({ operation: operation });
   }
 

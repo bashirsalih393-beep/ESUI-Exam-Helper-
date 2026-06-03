@@ -2,5 +2,5 @@
   "name": "ESUI Exam Helper AI",
   "description": "A comprehensive AI-powered academic assistant for Edo State University Iyamho students, featuring study summaries, exam preparation tools, a GPA/CGPA calculator, and an AI media lab.",
   "requestFramePermissions": ["microphone"],
-  "majorCapabilities": []
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

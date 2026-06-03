@@ -157,26 +157,27 @@ export default memo(function GPACalculator({ isDarkMode, onToggleDarkMode, userI
         animate={{ opacity: 1, y: 0 }}
         className="max-w-6xl mx-auto"
       >
-        <div className="sticky top-0 z-40 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md flex flex-col md:flex-row md:items-center justify-between gap-6 py-6 mb-10 border-b border-transparent">
-          <div className="flex items-center gap-3">
-            <div className="p-3 bg-indigo-600 text-white rounded-2xl shadow-lg shadow-indigo-100 dark:shadow-none">
-              <Calculator size={32} />
+        <div className="sticky top-0 z-40 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md flex flex-col md:flex-row md:items-center justify-between gap-6 py-6 mb-10 border-b border-slate-100 dark:border-zinc-800">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 bg-indigo-600 text-white rounded-2xl shadow-xl shadow-indigo-500/20 flex items-center justify-center shrink-0">
+              <Calculator size={28} />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">GPA Calculator</h1>
-              <p className="text-slate-500 font-medium text-sm">Quick sessional performance calculation</p>
+              <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">GPA Calculator</h1>
+              <p className="text-[10px] font-black text-slate-400 dark:text-zinc-500 uppercase tracking-[0.2em] mt-1">Calculate your semester result</p>
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <button 
-              onClick={onToggleDarkMode}
-              className="p-3 bg-white dark:bg-zinc-900 text-slate-500 dark:text-zinc-400 rounded-2xl border border-slate-200 dark:border-zinc-800 transition-all hover:bg-slate-50 dark:hover:bg-zinc-800"
-            >
-              {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
-            </button>
-             <div className="flex flex-col items-center bg-indigo-600 px-6 py-2 rounded-2xl shadow-lg shadow-indigo-200 dark:shadow-none">
-                <span className="text-[10px] font-bold text-indigo-100 uppercase tracking-widest">Sessional GPA</span>
-                <span className="text-2xl font-black text-white">{gpa.toFixed(2)}</span>
+             <button 
+                onClick={onToggleDarkMode}
+                className="p-3 bg-white dark:bg-zinc-900 text-slate-400 dark:text-zinc-500 rounded-2xl border border-slate-200 dark:border-zinc-800 transition-all hover:bg-slate-50 dark:hover:bg-zinc-800 shadow-sm"
+                title={isDarkMode ? 'Lunar Mode' : 'Solar Mode'}
+             >
+                {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+             </button>
+             <div className="flex flex-col items-end px-6 py-3 bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-800 shadow-sm">
+                <span className="text-[9px] font-black text-slate-400 dark:text-zinc-500 uppercase tracking-widest">Sessional GPA</span>
+                <span className="text-3xl font-black text-indigo-600 dark:text-indigo-400 tabular-nums tracking-tighter">{gpa.toFixed(2)}</span>
              </div>
           </div>
         </div>
@@ -210,41 +211,40 @@ export default memo(function GPACalculator({ isDarkMode, onToggleDarkMode, userI
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <div className="flex items-center gap-1.5 mb-1.5">
-                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Credit Units</label>
+                      <div className="flex items-center gap-1.5 mb-2">
+                        <label className="text-[10px] font-black text-slate-400 dark:text-zinc-500 uppercase tracking-[0.2em] block">Load (Credit Units)</label>
                         <div className="group relative">
-                          <Info size={10} className="text-slate-300 cursor-help" />
-                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-slate-800 text-white text-[9px] rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 shadow-xl">
-                            The weight of this course. More units have a larger impact on your GPA.
+                          <Info size={12} className="text-slate-300 dark:text-zinc-600 cursor-help transition-colors hover:text-indigo-500" />
+                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-56 p-3 bg-slate-900 dark:bg-zinc-800 text-white text-[10px] rounded-2xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none z-50 shadow-2xl border border-white/10 leading-relaxed font-medium">
+                            The academic weight of this course. Higher units significantly influence your final GPA calculation.
                           </div>
                         </div>
                       </div>
                       <select 
                         value={units}
                         onChange={e => setUnits(e.target.value)}
-                        className="w-full bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-xl px-3 py-3 text-sm focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 dark:text-white transition-all cursor-pointer"
+                        className="w-full bg-[#F8FAFC] dark:bg-zinc-800 border border-slate-100 dark:border-zinc-700 rounded-2xl px-5 py-4 text-sm font-black focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all dark:text-white cursor-pointer appearance-none"
                       >
-                        {[1,2,3,4,6].map(u => <option key={u} value={u}>{u} Unit{u>1?'s':''}</option>)}
+                        {[1,2,3,4,5,6].map(u => <option key={u} value={u}>{u} UNIT{u>1?'S':''}</option>)}
                       </select>
                     </div>
                     <div>
-                      <div className="flex items-center gap-1.5 mb-1.5">
-                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Exam Score (%)</label>
+                      <div className="flex items-center gap-1.5 mb-2">
+                        <label className="text-[10px] font-black text-slate-400 dark:text-zinc-500 uppercase tracking-[0.2em] block">Yield (Exam Score %)</label>
                         <div className="group relative">
-                          <Info size={10} className="text-slate-300 cursor-help" />
-                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-slate-800 text-white text-[9px] rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 shadow-xl">
-                            Your total percentage score (0-100). This determines your grade point.
+                          <Info size={12} className="text-slate-300 dark:text-zinc-600 cursor-help transition-colors hover:text-indigo-500" />
+                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-56 p-3 bg-slate-900 dark:bg-zinc-800 text-white text-[10px] rounded-2xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none z-50 shadow-2xl border border-white/10 leading-relaxed font-medium">
+                            Enter your final percentage score (0-100). The system automatically maps this to its corresponding grade point.
                           </div>
                         </div>
                       </div>
                       <input 
-                        type="number"
-                        min="0"
-                        max="100"
+                        type="text"
+                        inputMode="numeric"
                         value={score}
                         onChange={e => setScore(e.target.value)}
-                        className="w-full bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 dark:text-white transition-all shadow-sm hover:border-slate-300 dark:hover:border-zinc-600"
-                        placeholder="0-100"
+                        className="w-full bg-[#F8FAFC] dark:bg-zinc-800 border border-slate-100 dark:border-zinc-700 rounded-2xl px-5 py-4 text-sm font-black focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all dark:text-white shadow-sm hover:border-slate-300 dark:hover:border-zinc-600"
+                        placeholder="E.G. 75"
                       />
                     </div>
                   </div>
@@ -369,30 +369,38 @@ export default memo(function GPACalculator({ isDarkMode, onToggleDarkMode, userI
 
 const CourseRow = memo(({ course, onDelete, onUpdate }: { course: Course; onDelete: (id: string) => void; onUpdate: (updates: Partial<Course>) => void }) => (
   <tr className="text-sm text-slate-700 dark:text-zinc-300 hover:bg-slate-50/50 dark:hover:bg-zinc-800/50 transition-colors list-item-render group">
-    <td className="px-6 py-5 font-bold uppercase">{course.name}</td>
+    <td className="px-6 py-5">
+      <div className="flex flex-col">
+        <span className="font-black text-slate-900 dark:text-white uppercase tracking-wider">{course.name}</span>
+        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-0.5">Verified Record</span>
+      </div>
+    </td>
     <td className="px-6 py-5 text-center">
       <input 
         type="number"
         value={course.creditUnits}
         onChange={(e) => onUpdate({ creditUnits: Number(e.target.value) })}
-        className="w-12 bg-transparent text-center font-medium border border-transparent hover:border-slate-200 dark:hover:border-zinc-700 rounded-lg transition-all focus:outline-none focus:bg-white dark:focus:bg-zinc-800 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+        className="w-12 bg-white dark:bg-zinc-800 text-center font-black border border-slate-200 dark:border-zinc-700 rounded-lg py-1 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 shadow-sm"
       />
     </td>
-    <td className="px-6 py-5 text-center">
-      <input 
-        type="number"
-        value={course.score}
-        onChange={(e) => onUpdate({ score: Number(e.target.value) })}
-        className="w-16 bg-transparent text-center border border-transparent hover:border-slate-200 dark:hover:border-zinc-700 rounded-lg transition-all focus:outline-none focus:bg-white dark:focus:bg-zinc-800 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
-      />
-      <span className="text-[10px] text-slate-400 ml-0.5">%</span>
+    <td className="px-6 py-5 text-center px-8">
+      <div className="flex items-center justify-center gap-1">
+        <input 
+          type="number"
+          value={course.score}
+          onChange={(e) => onUpdate({ score: Number(e.target.value) })}
+          className="w-16 bg-white dark:bg-zinc-800 text-center font-black border border-slate-200 dark:border-zinc-700 rounded-lg py-1 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 shadow-sm"
+        />
+        <span className="text-[10px] font-black text-slate-400 opacity-50">%</span>
+      </div>
     </td>
     <td className="px-6 py-5 text-center">
-      <span className={`px-2 py-1 rounded-md font-bold text-[10px] ${
-        course.grade === 'A' ? 'bg-green-100 text-green-700' :
-        course.grade === 'B' ? 'bg-blue-100 text-blue-700' :
-        course.grade === 'C' ? 'bg-yellow-100 text-yellow-700' :
-        course.grade === 'F' ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-700'
+      <span className={`inline-flex items-center justify-center w-8 h-8 rounded-lg font-black text-xs ${
+        course.grade === 'A' ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' :
+        course.grade === 'B' ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20' :
+        course.grade === 'C' ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/20' :
+        course.grade === 'F' ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/20' : 
+        'bg-slate-500 text-white shadow-lg shadow-slate-500/20'
       }`}>
         {course.grade}
       </span>
@@ -400,7 +408,7 @@ const CourseRow = memo(({ course, onDelete, onUpdate }: { course: Course; onDele
     <td className="px-6 py-5 text-right opacity-0 group-hover:opacity-100 transition-opacity">
       <button 
         onClick={() => onDelete(course.id)}
-        className="p-2 text-slate-400 hover:text-red-500 transition-colors"
+        className="p-2 text-slate-400 hover:text-rose-500 transition-colors"
       >
         <Trash2 size={16} />
       </button>

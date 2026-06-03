@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, memo, useCallback } from 'react';
-import { Send, Image as ImageIcon, Sparkles, User, Bot, Paperclip, Loader2, X, Sun, Moon, Mic, MicOff } from 'lucide-react';
+import { Send, Image as ImageIcon, Sparkles, User, Bot, Paperclip, Loader2, X, Sun, Moon, Mic, MicOff, BookOpen, FileText, Target } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import Markdown from 'react-markdown';
 import { Virtuoso } from 'react-virtuoso';
@@ -135,7 +135,7 @@ export default memo(function ChatArea({ messages, onSendMessage, isStreaming, st
 
   const toggleListening = useCallback(() => {
     if (!recognitionRef.current) {
-      alert('Speech recognition is not supported in your browser.');
+      setSpeechError('Speech recognition is not supported in your browser.');
       return;
     }
 
@@ -292,6 +292,31 @@ export default memo(function ChatArea({ messages, onSendMessage, isStreaming, st
           onSubmit={handleSubmit}
           className="max-w-3xl mx-auto relative"
         >
+          {/* Quick Actions */}
+          <div className="flex flex-wrap gap-2 mb-4 justify-center md:justify-start">
+             {[
+               { id: 'explain', label: 'Explain Topic', icon: <Sparkles size={12} /> },
+               { id: 'quiz', label: 'Generate Quiz', icon: <BookOpen size={12} /> },
+               { id: 'summarize', label: 'Summarize Notes', icon: <FileText size={12} /> },
+               { id: 'exam', label: 'Exam Prep', icon: <Target size={12} /> }
+             ].map(action => (
+               <button
+                 key={action.id}
+                 type="button"
+                 onClick={() => {
+                   if (action.id === 'explain') setInput("Explain this topic in simple terms: ");
+                   if (action.id === 'quiz') setInput("Generate 5 multiple choice questions with answers based on: ");
+                   if (action.id === 'summarize') setInput("Summarize these notes into key points: ");
+                   if (action.id === 'exam') setInput("Generate potential exam questions and model answers for: ");
+                 }}
+                 className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-lg text-[9px] font-black uppercase tracking-widest text-slate-500 hover:border-indigo-500 hover:text-indigo-600 transition-all shadow-sm"
+               >
+                  {action.icon}
+                  {action.label}
+               </button>
+             ))}
+          </div>
+
           {attachments.length > 0 && (
             <div className="absolute bottom-full left-0 mb-3 flex gap-2 p-3 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-2xl shadow-xl z-20">
               {attachments.map((at, idx) => (

@@ -1,5 +1,5 @@
 import React, { useState, memo } from 'react';
-import { Plus, Settings, History, Calculator, BookOpen, LogOut, Menu, X, Trash2, Sun, Moon, User, GraduationCap, Sparkles, FileText } from 'lucide-react';
+import { Plus, Settings, History, Calculator, BookOpen, LogOut, Menu, X, Trash2, Sun, Moon, User, GraduationCap, Sparkles, FileText, Edit2, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChatSession } from '../types';
 
@@ -9,8 +9,9 @@ interface SidebarProps {
   onSessionSelect: (id: string) => void;
   onNewChat: () => void;
   onDeleteSession: (id: string) => void;
-  activeView: 'chat' | 'gpa' | 'cgpa' | 'media' | 'summarizer';
-  onViewChange: (view: 'chat' | 'gpa' | 'cgpa' | 'media' | 'summarizer') => void;
+  onRenameSession: (id: string, newTitle: string) => void;
+  activeView: 'chat' | 'gpa' | 'cgpa' | 'media' | 'summarizer' | 'settings';
+  onViewChange: (view: 'chat' | 'gpa' | 'cgpa' | 'media' | 'summarizer' | 'settings') => void;
   onLogout: () => void;
   userEmail: string | null;
   isDarkMode: boolean;
@@ -23,6 +24,7 @@ export default memo(function Sidebar({
   onSessionSelect,
   onNewChat,
   onDeleteSession,
+  onRenameSession,
   activeView,
   onViewChange,
   onLogout,
@@ -31,6 +33,25 @@ export default memo(function Sidebar({
   onToggleDarkMode
 }: SidebarProps) {
   const [isOpen, setIsOpen] = useState(true);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingTitle, setEditingTitle] = useState('');
+
+  const handleStartEditing = (session: ChatSession) => {
+    setEditingId(session.id);
+    setEditingTitle(session.title || '');
+  };
+
+  const handleFinishEditing = () => {
+    if (editingId && editingTitle.trim()) {
+      onRenameSession(editingId, editingTitle.trim());
+    }
+    setEditingId(null);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') handleFinishEditing();
+    if (e.key === 'Escape') setEditingId(null);
+  };
 
   return (
     <>
@@ -78,129 +99,154 @@ export default memo(function Sidebar({
               </div>
             </div>
 
-            <div className="flex-1 p-4 flex flex-col overflow-hidden">
-              {/* New Chat Button */}
-              <button
-                onClick={onNewChat}
-                className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-lg text-sm font-semibold hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors shadow-sm mb-6 dark:text-white"
-                id="new-chat-btn"
-              >
-                <Plus size={16} />
-                New Study Session
-              </button>
-
+            <div className="flex-1 p-6 flex flex-col overflow-y-auto custom-scrollbar space-y-8">
               {/* Tools Section */}
-              <div className="mb-8">
-                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest px-2 mb-3">Academic Tools</p>
-                <div className="space-y-1">
-                  <button
-                    onClick={() => onViewChange('chat')}
-                    className={`flex items-center gap-3 w-full p-2.5 rounded-lg text-sm font-medium transition-colors ${activeView === 'chat' ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-900/40' : 'text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-900'}`}
-                  >
-                    <BookOpen size={16} />
-                    <span>Learning Assistant</span>
-                  </button>
-                  <button
-                    onClick={() => onViewChange('summarizer')}
-                    className={`flex items-center gap-3 w-full p-2.5 rounded-lg text-sm font-medium transition-colors ${activeView === 'summarizer' ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-900/40' : 'text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-900'}`}
-                  >
-                    <FileText size={16} />
-                    <span>Study Summarizer</span>
-                  </button>
-                  <button
-                    onClick={() => onViewChange('gpa')}
-                    className={`flex items-center gap-3 w-full p-2.5 rounded-lg text-sm font-medium transition-colors ${activeView === 'gpa' ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-900/40' : 'text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-900'}`}
-                  >
-                    <Calculator size={16} />
-                    <span>GPA Calculator</span>
-                  </button>
-                  <button
-                    onClick={() => onViewChange('cgpa')}
-                    className={`flex items-center gap-3 w-full p-2.5 rounded-lg text-sm font-medium transition-colors ${activeView === 'cgpa' ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-900/40' : 'text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-900'}`}
-                  >
-                    <GraduationCap size={16} />
-                    <span>CGPA Tracker</span>
-                  </button>
-                  <button
-                    onClick={() => onViewChange('media')}
-                    className={`flex items-center gap-3 w-full p-2.5 rounded-lg text-sm font-medium transition-colors ${activeView === 'media' ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-900/40' : 'text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-900'}`}
-                  >
-                    <Sparkles size={16} />
-                    <span>Media Lab</span>
-                  </button>
+              <div className="space-y-4">
+                <p className="text-[10px] font-black text-slate-400 dark:text-zinc-500 uppercase tracking-[0.2em] px-2">Academic Assets</p>
+                <div className="grid grid-cols-1 gap-1.5">
+                  <SidebarNavItem 
+                    icon={<BookOpen size={18} />} 
+                    label="AI Assistant" 
+                    isActive={activeView === 'chat'} 
+                    onClick={() => onViewChange('chat')} 
+                  />
+                   <SidebarNavItem 
+                    icon={<FileText size={18} />} 
+                    label="Summarizer" 
+                    isActive={activeView === 'summarizer'} 
+                    onClick={() => onViewChange('summarizer')} 
+                  />
+                  <SidebarNavItem 
+                    icon={<Calculator size={18} />} 
+                    label="GPA Calculator" 
+                    isActive={activeView === 'gpa'} 
+                    onClick={() => onViewChange('gpa')} 
+                  />
+                  <SidebarNavItem 
+                    icon={<GraduationCap size={18} />} 
+                    label="CGPA Tracker" 
+                    isActive={activeView === 'cgpa'} 
+                    onClick={() => onViewChange('cgpa')} 
+                  />
+                  <SidebarNavItem 
+                    icon={<Sparkles size={18} />} 
+                    label="Media Lab" 
+                    isActive={activeView === 'media'} 
+                    onClick={() => onViewChange('media')} 
+                  />
+                  <SidebarNavItem 
+                    icon={<Settings size={18} />} 
+                    label="Identity Settings" 
+                    isActive={activeView === 'settings'} 
+                    onClick={() => onViewChange('settings')} 
+                  />
                 </div>
               </div>
 
               {/* History Section */}
-              <div className="flex-1 overflow-y-auto mb-4 custom-scrollbar">
-                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest px-2 mb-3">Study History</p>
-                <div className="space-y-1">
-                  {sessions.map((session) => (
-                    <div key={session.id} className="group relative list-item-render">
-                      <button
-                        onClick={() => onSessionSelect(session.id)}
-                        className={`w-full flex items-center gap-3 p-2.5 rounded-lg text-sm transition-colors truncate pr-8 ${activeSessionId === session.id ? 'bg-slate-200/50 dark:bg-zinc-800 text-slate-900 dark:text-white font-medium' : 'text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-900'}`}
-                      >
-                        <History size={14} className="opacity-50 shrink-0" />
-                        <span className="truncate">{session.title || "New session"}</span>
-                      </button>
-                      <button 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onDeleteSession(session.id);
-                        }}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
-                        <Trash2 size={12} />
-                      </button>
+              <div className="space-y-4">
+                 <div className="flex items-center justify-between px-2">
+                    <p className="text-[10px] font-black text-slate-400 dark:text-zinc-500 uppercase tracking-[0.2em]">Session Logs</p>
+                    <button 
+                      onClick={onNewChat}
+                      className="p-1.5 bg-slate-100 dark:bg-zinc-800 text-slate-500 rounded-lg hover:bg-indigo-600 hover:text-white transition-all shadow-sm"
+                    >
+                      <Plus size={14} />
+                    </button>
+                 </div>
+                <div className="space-y-1 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                  {sessions.length === 0 ? (
+                    <div className="px-3 py-8 rounded-2xl border border-dashed border-slate-200 dark:border-zinc-800 text-center">
+                       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">No active logs</p>
                     </div>
-                  ))}
+                  ) : (
+                    sessions.map((session) => (
+                      <div key={session.id} className="group relative">
+                        {editingId === session.id ? (
+                          <div className="flex items-center gap-2 p-2.5 bg-white dark:bg-zinc-900 border border-indigo-200 dark:border-indigo-900 rounded-xl shadow-sm">
+                            <input
+                              autoFocus
+                              type="text"
+                              value={editingTitle}
+                              onChange={(e) => setEditingTitle(e.target.value)}
+                              onBlur={handleFinishEditing}
+                              onKeyDown={handleKeyDown}
+                              className="bg-transparent text-xs w-full outline-none text-slate-900 dark:text-white font-bold"
+                            />
+                            <button onClick={handleFinishEditing} className="text-emerald-500 hover:text-emerald-600">
+                              <Check size={14} />
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="relative group">
+                            <button
+                              onClick={() => onSessionSelect(session.id)}
+                              className={`w-full flex items-center gap-3 p-3 rounded-xl text-xs font-bold transition-all truncate group-hover:bg-slate-100 dark:group-hover:bg-zinc-900/50 ${activeSessionId === session.id ? 'bg-white dark:bg-zinc-900 text-indigo-600 dark:text-indigo-400 shadow-sm border border-slate-100 dark:border-zinc-800' : 'text-slate-500 dark:text-zinc-500'}`}
+                            >
+                              <div className={`w-1.5 h-1.5 rounded-full ${activeSessionId === session.id ? 'bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.5)]' : 'bg-slate-300 dark:bg-zinc-700'}`} />
+                              <span className="truncate">{session.title || "New session"}</span>
+                            </button>
+                            <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-100 dark:bg-zinc-900/50 pl-2 rounded-lg">
+                              <button 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleStartEditing(session);
+                                }}
+                                className="p-1.5 text-slate-400 hover:text-indigo-500 transition-colors"
+                              >
+                                <Edit2 size={12} />
+                              </button>
+                              <button 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onDeleteSession(session.id);
+                                }}
+                                className="p-1.5 text-slate-400 hover:text-red-500 transition-colors"
+                              >
+                                <Trash2 size={12} />
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  )}
                 </div>
               </div>
             </div>
 
             {/* Footer */}
-            <div className="p-4 mt-auto border-t border-slate-200 dark:border-zinc-800 bg-white/50 dark:bg-zinc-900/50">
-              <button 
-                onClick={onToggleDarkMode}
-                className="flex items-center gap-3 w-full p-2 mb-4 text-slate-500 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-md transition-colors text-xs font-medium"
-              >
-                {isDarkMode ? <Sun size={14} /> : <Moon size={14} />}
-                {isDarkMode ? 'Light Mode' : 'Dark Mode'}
-              </button>
-              
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center flex-shrink-0 shadow-sm border border-slate-200 dark:border-zinc-700 overflow-hidden p-1">
-                  <img 
-                    src="https://upload.wikimedia.org/wikipedia/en/thumb/4/4b/Edo_State_University_Iyamho_logo.png/220px-Edo_State_University_Iyamho_logo.png" 
-                    alt="Logo"
-                    className="w-full h-full object-contain"
-                    referrerPolicy="no-referrer"
-                    loading="lazy"
-                  />
+            <div className="p-6 mt-auto border-t border-slate-200 dark:border-zinc-800 bg-[#F8FAFC]/50 dark:bg-zinc-950/50">
+              <div className="flex items-center gap-4 bg-white dark:bg-zinc-900 p-3 rounded-2xl border border-slate-200 dark:border-zinc-800 shadow-sm mb-4">
+                <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/10 flex items-center justify-center flex-shrink-0 font-black text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-900/20">
+                  {userEmail?.charAt(0).toUpperCase() || 'S'}
                 </div>
                 <div className="overflow-hidden">
-                  <p className="text-xs font-bold truncate text-slate-700 dark:text-zinc-300">
+                  <p className="text-xs font-black truncate text-slate-900 dark:text-white">
                     {userEmail?.split('@')[0] || 'Student'}
                   </p>
-                  <p className="text-[10px] text-slate-400 font-medium truncate">
-                    {userEmail || 'University Email/Email'}
+                  <p className="text-[10px] text-slate-400 font-bold truncate tracking-tight">
+                    {userEmail || 'Academic Identity'}
                   </p>
                 </div>
-                <button 
-                  onClick={onLogout}
-                  className="ml-auto p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-lg transition-colors"
-                  title="Logout"
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                 <button 
+                  onClick={onToggleDarkMode}
+                  className="flex items-center justify-center gap-2 p-2.5 bg-white dark:bg-zinc-900 text-slate-500 hover:text-indigo-600 border border-slate-200 dark:border-zinc-800 rounded-xl transition-all text-[10px] font-black uppercase tracking-widest shadow-sm active:scale-95"
                 >
-                  <LogOut size={16} />
+                  {isDarkMode ? <Sun size={14} className="text-amber-500" /> : <Moon size={14} className="text-indigo-600" />}
+                  {isDarkMode ? 'Light' : 'Dark'}
+                </button>
+                 <button 
+                  onClick={onLogout}
+                  className="flex items-center justify-center gap-2 p-2.5 bg-white dark:bg-zinc-900 text-slate-400 hover:text-red-500 border border-slate-200 dark:border-zinc-800 rounded-xl transition-all text-[10px] font-black uppercase tracking-widest shadow-sm active:scale-95"
+                >
+                  <LogOut size={14} />
+                  Exit
                 </button>
               </div>
-              <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest text-center opacity-70">
-                Edo State University Iyamho
-              </p>
-              <p className="text-[8px] text-slate-400 text-center mt-1 italic">
-                Created by Salih Bashir, a Cybersecurity student
-              </p>
             </div>
           </motion.aside>
         )}
@@ -210,9 +256,27 @@ export default memo(function Sidebar({
       {isOpen && (
         <div 
           onClick={() => setIsOpen(false)}
-          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-30 lg:hidden"
+          className="fixed inset-0 bg-slate-900/20 backdrop-blur-sm z-30 lg:hidden"
         />
       )}
     </>
   );
 });
+
+function SidebarNavItem({ icon, label, isActive, onClick }: { icon: React.ReactNode, label: string, isActive: boolean, onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`flex items-center gap-3 w-full p-3 rounded-xl text-xs font-black uppercase tracking-[0.1em] transition-all group ${
+        isActive 
+        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200 dark:shadow-none translate-x-1' 
+        : 'text-slate-500 dark:text-zinc-500 hover:bg-slate-100 dark:hover:bg-zinc-900 hover:translate-x-1'
+      }`}
+    >
+      <div className={`${isActive ? 'text-white' : 'text-slate-400 dark:text-zinc-600 group-hover:text-indigo-500'} transition-colors`}>
+        {icon}
+      </div>
+      <span>{label}</span>
+    </button>
+  );
+}
